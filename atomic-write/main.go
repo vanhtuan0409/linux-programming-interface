@@ -16,6 +16,7 @@ var (
 )
 
 func init() {
+	// fill large buffer with a char for easier verifying
 	for i := 0; i < len(extraLargeBuffer); i++ {
 		extraLargeBuffer[i] = 'a'
 	}

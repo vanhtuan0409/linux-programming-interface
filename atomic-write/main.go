@@ -9,21 +9,34 @@ import (
 )
 
 var (
-	xFlag = flag.Bool("x", false, "Exclude O_APPEND flag")
-	bFlag = flag.Bool("b", false, "Use buffer writer")
+	xFlag            = flag.Bool("x", false, "Exclude O_APPEND flag")
+	bFlag            = flag.Bool("b", false, "Use buffer writer")
+	eFlag            = flag.Bool("e", false, "Use extra large buffer (8kb) for 1 write")
+	extraLargeBuffer = make([]byte, 2<<12) //Generate a large buffer with size 8016
 )
+
+func init() {
+	for i := 0; i < len(extraLargeBuffer); i++ {
+		extraLargeBuffer[i] = 'a'
+	}
+}
 
 func write(f *os.File) (int, error) {
 	if *xFlag {
 		f.Seek(0, os.SEEK_END)
 	}
-	f.Write([]byte{'a'})
+	if *eFlag {
+		f.Write(extraLargeBuffer)
+	} else {
+		f.Write([]byte{'a'})
+	}
 	return 0, nil
 }
 
 func main() {
 	flag.Parse()
 	fmt.Println("x :=", *xFlag)
+	fmt.Println("e :=", *eFlag)
 
 	fFlags := os.O_CREATE | os.O_WRONLY
 	if !*xFlag {
